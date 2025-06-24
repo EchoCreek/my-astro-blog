@@ -1,0 +1,144 @@
+---
+title: 'Astro + Github + Cloudflare Page 的组合部署教程'
+description: '讲述了Astro博客如何部署到github，并使用Cloudflare构建并发布'
+pubDate: 'June 24 2025'
+---
+
+## **从零到全球上线：Astro + Github + Cloudflare 现代化博客搭建终极指南**
+
+本教程的目标，是构建并部署一个性能卓越、安全可靠、极易维护且几乎零成本的现代化个人博客。
+
+本教程的技术组合：**Astro** 用于构建网站，**GitHub** 用于代码托管与版本控制，**Cloudflare** 用于全球部署和加速。
+
+### **本指南的特色**
+
+- **免费优先**：我们将完全基于免费套餐来完成所有核心功能。
+
+---
+
+### **一、为什么选择 Astro + Cloudflare？**
+
+#### **1.1 Astro 的魅力：内容与结构的完美分离**
+
+Astro 不是一个普通的网站框架，它的核心优势在于其独特的理念。
+
+-  **`.md`** **文件写内容**：我们的大部分写作工作都在通用的 Markdown (`.md`) 文件中完成。这让我们能专注于内容创作，使用简单、通用的格式，而无需关心网站的复杂布局。
+-  **`.astro`** **文件做布局**：Astro 的专有文件格式 `.astro` 则像一个“超级HTML”，它负责定义网站的骨架、组件和复杂页面（如首页）。它能将我们的 Markdown 内容包裹起来，形成一个完整的网页。
+- **性能至上（岛屿架构）** ：Astro 默认不为浏览器加载任何不必要的 JavaScript，只有当页面上的某个组件（如评论区）需要交互时，才会“激活”它。这使得 Astro 网站的加载速度快如闪电。
+
+这种**内容与结构分离**的设计，让项目维护变得异常清晰。
+
+#### **1.2 Cloudflare 的强大：不止是免费托管**
+
+Cloudflare Pages 为我们提供了一个完美的部署平台。
+
+- **全球边缘网络**：构建的网站会被部署到离全球用户最近的数百个数据中心，确保每个人都能获得极速的访问体验。
+- **与 Git 无缝集成**：只需将代码推送到 GitHub，Cloudflare 就会自动完成后续所有部署工作，实现真正的自动化。
+- **一体化生态**：从 DNS、SSL证书、安全防护到未来的 Workers、D1数据库，Cloudflare 提供了一站式的解决方案。
+
+---
+
+### **二、本地部署Astro**
+
+#### **2.1 准备工作**
+
+请提前安装 `Node.js` (LTS 版本)、`Git` 和 `VS Code` 编辑器。
+
+#### **2.2 创建项目**
+
+1. 打开终端，运行：
+
+    ```
+    npm create astro@latest
+    ```
+2. 在安装向导中，我们选择 `Use a blog template`，并对所有问题回答“是”(Yes) 或选择推荐选项。
+
+#### **2.3 本地预览与修改**
+
+1. 进入项目文件夹：
+
+    ```
+    cd your-project-name
+    ```
+2. 启动开发服务器：
+
+    ```
+    npm run dev
+    ```
+3. 浏览器访问 `http://localhost:4321`，可以看到一个功能完备的博客。尝试修改 `src/pages/index.astro` 文件中的一些文字并保存，看看浏览器中的内容是不是瞬间就更新了。
+
+---
+
+### **三、上传至Github**
+
+这是本指南的**第一个重点**。善用版本管理，可以帮助我们合理安全的编写博客笔记。
+
+#### **3.1 首次推送到 GitHub**
+
+1. 在 GitHub.com 上创建一个**新的、空的、公开的**仓库。**不要**勾选任何初始化选项。
+2. 回到本地终端，依次执行以下命令，将本地代码与这个远程仓库关联并推送：
+
+    ```
+    git remote add origin [你的GitHub仓库URL]
+    git branch -M main
+    git push -u origin main
+    ```
+
+#### **3.2 [重点] 项目设置：协议与分支保护**
+
+在代码公开后，进行规范的设置非常重要。
+
+- **添加开源协议**：
+
+  1. 在 GitHub 仓库页面，点击 `Add file` -\> `Create new file`。
+  2. 文件名输入 `LICENSE`。
+  3. 点击右侧出现的 `Choose a license template` 按钮。
+  4. 选择 `MIT License`，确认信息后提交。
+  5. 这明确了代码的“使用权”，允许他人学习和复用我们的代码，这是开源精神的体现，也是对我们作品的一种法律规范。
+- **设置分支保护**：
+
+  1. 在仓库 `Settings` -\> `Branches` 中，为 `main` 分支添加一条保护规则。
+  2. 建议至少勾选 **`Require a pull request before merging`**  **(合并前需要拉取请求)** 。
+  3. 这是为了保护主分支，防止任何未经审查的或意外的修改直接影响到我们的线上网站，增加了一道“安全门”。
+
+#### **3.3 [重点] 日常开发：安全的 Pull Request 工作流**
+
+由于开启了分支保护，我们日常的更新流程会变为更加安全和专业的“拉取请求”模式。
+
+1. **同步代码**：每次开始新工作前，先确保本地代码是最新的：
+
+    ```
+    git checkout main
+    git pull origin main
+    ```
+2. **创建新分支**：为一个新功能或一篇文章创建一个独立的分支：
+
+    ```
+    git checkout -b feature/add-new-page
+    ```
+3. **修改与提交**：在新分支上进行博客文件的所有修改（例如，创建新页面 `src/content/blog/new-page.md`），然后提交：
+
+    ```
+    git add .
+    git commit -m "feat: add a new page"
+    ```
+4. **推送新分支**：将这个新分支推送到 GitHub：
+
+    ```
+    git push -u origin feature/add-new-page
+    ```
+5. **创建并合并 Pull Request**：
+
+    - 在 GitHub 网站上，为新分支创建一个 Pull Request。
+    - 在 Pull Request 页面进行检查与修改，然后点击 `Merge pull request` 将其合并到 `main` 分支。
+    - 合并后，可以安全地删除这个功能分支。
+
+---
+
+### **四、部署到Cloudflare Pages**
+
+1. 登录 Cloudflare，进入 `Workers & Pages`，创建一个新的 `Pages` 应用。
+2. 连接到GitHub 账户，并选择相应的博客仓库。
+3. 在“构建设置”中，**最关键的一步是**：在“框架预设 (Framework preset)”下拉菜单中选择 **`Astro`**。Cloudflare 会自动配置好所有构建命令。
+4. 点击 `Save and Deploy`。等待一两分钟，Cloudflare 会生成一个 `.pages.dev` 的域名。
+5. 在项目的 `Custom domains` 设置中，可以轻松地将自己的域名绑定上去。
