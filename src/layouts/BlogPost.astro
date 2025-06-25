@@ -11,8 +11,33 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
+
+		{/* --- 新增部分 --- */}
+        <script is:inline>
+            const getTheme = () => {
+                // 读取用户在切换器中选择的偏好 ('light', 'dark', 'auto')
+                let preference = localStorage.getItem('theme-preference');
+                if (!preference) {
+                    // 如果用户从未设置过，则默认为 'auto'
+                    preference = 'auto';
+                }
+
+                if (preference === 'auto') {
+                    // “自动”模式下，跟随系统
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+
+                // “明亮”或“黑暗”模式下，直接返回用户的选择
+                return preference;
+            };
+
+            const theme = getTheme();
+            document.documentElement.dataset.theme = theme;
+        </script>
+        {/* --- 新增部分结束 --- */}
+
 		<BaseHead title={title} description={description} />
 		<style>
 			main {
@@ -34,7 +59,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				max-width: calc(100% - 2em);
 				margin: auto;
 				padding: 1em;
-				color: rgb(var(--gray-dark));
+				color: var(--font-color);
 			}
 			.title {
 				margin-bottom: 1em;
@@ -47,7 +72,8 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			}
 			.date {
 				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+				color: var(--font-color);
+				opacity: 0.7;
 			}
 			.last-updated-on {
 				font-style: italic;
@@ -56,6 +82,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 	</head>
 
 	<body>
+		<div class="page-wrapper">
 		<Header />
 		<main>
 			<article>
@@ -82,5 +109,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			</article>
 		</main>
 		<Footer />
+		</div>
 	</body>
 </html>

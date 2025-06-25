@@ -11,11 +11,48 @@
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
 	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
+	
+    /* --- 语义化变量 --- */
+    /* 1. 页面“外部”的背景色 */
+	--html-bg: rgb(var(--gray-light));
+    /* 2. 页面“卡片”的背景色 */
+    --page-bg: #ffffff;
+
+	--header-bg: var(--page-bg);
+
+	--font-color: rgb(var(--gray-dark));
+	--heading-color: rgb(var(--black));
+	--link-color: var(--accent);
+	--code-bg-color: rgb(var(--gray-light));
+	--border-color: rgb(var(--gray-light));
+	--blockquote-border: var(--accent);
 	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
+		0 4px 8px rgba(var(--gray), 15%), 0 8px 16px rgba(var(--gray), 15%);
 }
+
+html.dark {
+	/* 1. 页面“外部”的背景色 (暗) */
+    --html-bg: #040920;
+    /* 2. 页面“卡片”的背景色 (暗) */
+    --page-bg: rgb(var(--gray-dark));
+	
+	--header-bg: rgb(48, 56, 77);
+
+	--font-color: rgb(var(--gray-light));
+	--heading-color: #ffffff;
+	--link-color: #64b5f6;
+	--code-bg-color: rgba(var(--black), 50%);
+	--border-color: rgb(var(--gray-dark));
+	--blockquote-border: #64b5f6;
+	--box-shadow:
+		0 4px 8px rgba(var(--black), 25%), 0 8px 16px rgba(var(--black), 25%);
+}
+
+html {
+	background-color: var(--html-bg);
+	scroll-behavior: smooth;
+}
+
 @font-face {
 	font-family: 'Atkinson';
 	src: url('/fonts/atkinson-regular.woff') format('woff');
@@ -33,32 +70,31 @@
 body {
 	font-family: 'Atkinson', sans-serif;
 	margin: 0;
-	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
+	/* 在 body 周围留出空隙，以显示 html 的背景色 */
+	padding: 2rem 1rem; 
+	min-height: 100vh;
+	box-sizing: border-box;
+
+	color: var(--font-color);
 	font-size: 20px;
 	line-height: 1.7;
+	transition: color 0.3s ease-in-out;
 }
 main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
+	/* 让 main 区域自动伸展，将页脚推向底部 */
+	flex-grow: 1;
+	width: 100%;
+    padding: 2em 3em; /* 为正文内容添加内边距 */
+    box-sizing: border-box;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+
+h1,h2,h3,h4,h5,h6 {
 	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
+	color: var(--heading-color);
 	line-height: 1.2;
 }
+/* ... 此处省略剩余未改变的 CSS 代码 ... */
+/* ... (h1, a, p, code, pre, 等样式保持不变) ... */
 h1 {
 	font-size: 3.052em;
 }
@@ -67,8 +103,7 @@ h2 {
 }
 h3 {
 	font-size: 1.953em;
-	/* 为h3标签添加下边距 */
-	margin-top: 2rem;	
+	margin-top: 2rem; 	
 }
 h4 {
 	font-size: 1.563em;
@@ -81,10 +116,11 @@ b {
 	font-weight: 700;
 }
 a {
-	color: var(--accent);
+	color: var(--link-color);
 }
 a:hover {
-	color: var(--accent);
+	color: var(--link-color);
+	text-decoration: underline;
 }
 p {
 	margin-bottom: 1em;
@@ -109,7 +145,7 @@ img {
 }
 code {
 	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
+	background-color: var(--code-bg-color);
 	border-radius: 2px;
 }
 pre {
@@ -120,14 +156,14 @@ pre > code {
 	all: unset;
 }
 blockquote {
-	border-left: 4px solid var(--accent);
+	border-left: 4px solid var(--blockquote-border);
 	padding: 0 0 0 20px;
 	margin: 0px;
 	font-size: 1.333em;
 }
 hr {
 	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
+	border-top: 1px solid var(--border-color);
 }
 @media (max-width: 720px) {
 	body {
@@ -146,24 +182,29 @@ hr {
 	height: 1px;
 	width: 1px;
 	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
 	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
 	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
 
-/* 为无序列表(ul)和有序列表(ol)设置自定义间距 */
+.page-wrapper {
+    background-color: var(--page-bg);
+    max-width: 960px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden; /* 确保子元素的圆角不会溢出 */
+
+    /* 使用 flex 布局实现粘性页脚 */
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 4rem); /* 减去 body 的上下 padding */
+}
+
 ul,
 ol {
-  /* 减小列表整体上方和下方的外边距 */
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-
-  /* (可选优化) 减少左侧的内边距，让列表更贴近正文 */
-  /* 浏览器的默认值通常很大 (约 40px) */
-  padding-left: 1.75rem; 
+	margin-top: 1rem;
+	margin-bottom: 1.5rem;
+	padding-left: 1.75rem; 
 }

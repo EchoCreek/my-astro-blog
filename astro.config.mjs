@@ -12,7 +12,7 @@ export default defineConfig({
 		expressiveCode({
       // 在这里可以添加您的自定义配置，我们先用一个基础的
       // themes 数组让它能根据亮/暗模式自动切换主题
-      themes: ['catppuccin-latte', 'catppuccin-frappe'],
+      themes: ['one-dark-pro'],
     }),
     mdx(), sitemap()
 	],

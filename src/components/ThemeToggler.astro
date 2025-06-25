@@ -1,0 +1,168 @@
+---
+// src/components/ThemeToggler.astro
+---
+
+<div class="theme-dropdown">
+  <button class="dropdown-toggle" aria-label="切换主题">
+    <span class="theme-icon-placeholder"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><button data-theme-value="light"><span class="icon">☀️</span> 明亮</button></li>
+    <li><button data-theme-value="dark"><span class="icon">🌙</span> 黑暗</button></li>
+    <li><button data-theme-value="auto"><span class="icon">🖥️</span> 自动</button></li>
+  </ul>
+</div>
+
+<script>
+  type ThemePreference = 'light' | 'dark' | 'auto';
+
+  const LS_THEME_KEY = 'theme-preference';
+
+  const dropdown = document.querySelector('.theme-dropdown');
+  const toggleButton = dropdown?.querySelector('.dropdown-toggle'); // 使用可选链增强健壮性
+  const iconPlaceholder = toggleButton?.querySelector('.theme-icon-placeholder');
+  const themeOptions = dropdown?.querySelectorAll<HTMLButtonElement>('.dropdown-menu button');
+
+  // ========================================================================
+  // 新增的“空值守卫”：检查核心元素是否存在，如果不存在则停止脚本执行
+  // ========================================================================
+  if (!dropdown || !toggleButton || !iconPlaceholder || !themeOptions) {
+    // 打印一个错误信息方便调试，然后退出
+    console.error('Theme Toggler elements not found. Script will not run.');
+  } else {
+    // 只有当所有元素都存在时，才执行下面的所有逻辑
+    const ICONS: Record<ThemePreference, string> = {
+      light: '☀️',
+      dark: '🌙',
+      auto: '🖥️',
+    };
+
+    const applyPreference = (preference: ThemePreference) => {
+      let theme = preference;
+      if (preference === 'auto') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+      } else {
+          document.documentElement.classList.remove('dark');
+      }
+
+      // 更新按钮图标的逻辑保持不变
+      updateToggleButtonIcon(preference);
+  };
+
+    const updateToggleButtonIcon = (preference: ThemePreference) => {
+      iconPlaceholder.textContent = ICONS[preference];
+    };
+
+    const savedPreference = localStorage.getItem(LS_THEME_KEY) as ThemePreference || 'auto';
+    applyPreference(savedPreference);
+
+    themeOptions.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const newPreference = button.dataset.themeValue as ThemePreference;
+        localStorage.setItem(LS_THEME_KEY, newPreference);
+        applyPreference(newPreference);
+        dropdown.classList.remove('open');
+        e.stopPropagation();
+      });
+    });
+
+    toggleButton.addEventListener('click', (e) => {
+      dropdown.classList.toggle('open');
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', () => {
+      if (dropdown.classList.contains('open')) {
+        dropdown.classList.remove('open');
+      }
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      const currentPreference = localStorage.getItem(LS_THEME_KEY) as ThemePreference;
+      if (currentPreference === 'auto' || !currentPreference) {
+        applyPreference('auto');
+      }
+    });
+  }
+</script>
+
+<style>
+  /* 样式保持不变 */
+  .theme-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5em;
+    line-height: 1;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+
+    /* --- 新增：固定尺寸来防止布局移动 --- */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* 给一个固定的宽度 */
+    height: 40px; /* 给一个固定的高度 */
+    /* --- 新增结束 --- */
+  }
+
+  .dropdown-toggle:hover {
+    background-color: var(--code-bg-color);
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin: 0.5rem 0 0;
+    padding: 0.5rem;
+    list-style: none;
+    background-color: var(--html-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    z-index: 30;
+    min-width: 120px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  }
+  .theme-dropdown.open .dropdown-menu {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .dropdown-menu li {
+    width: 100%;
+  }
+  .dropdown-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: var(--font-color);
+    transition: background-color 0.2s ease;
+  }
+  .dropdown-menu button:hover {
+    background-color: var(--code-bg-color);
+  }
+  .dropdown-menu .icon {
+    font-size: 1.25rem;
+  }
+</style>
