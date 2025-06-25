@@ -67,6 +67,8 @@ h2 {
 }
 h3 {
 	font-size: 1.953em;
+	/* 为h3标签添加下边距 */
+	margin-top: 2rem;	
 }
 h4 {
 	font-size: 1.563em;
@@ -152,4 +154,16 @@ hr {
 	clip-path: inset(50%);
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+}
+
+/* 为无序列表(ul)和有序列表(ol)设置自定义间距 */
+ul,
+ol {
+  /* 减小列表整体上方和下方的外边距 */
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+
+  /* (可选优化) 减少左侧的内边距，让列表更贴近正文 */
+  /* 浏览器的默认值通常很大 (约 40px) */
+  padding-left: 1.75rem; 
 }
