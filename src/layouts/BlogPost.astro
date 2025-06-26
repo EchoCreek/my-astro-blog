@@ -8,7 +8,7 @@ import { Image } from 'astro:assets';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags } = Astro.props;
 ---
 
 <html lang="zh-CN">
@@ -78,6 +78,52 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.last-updated-on {
 				font-style: italic;
 			}
+
+			.tags-container {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center; /* 保持标签组整体居中 */
+				gap: 1rem; /* 与标签云页面统一的间距 */
+				margin-bottom: 2rem;
+			}
+
+			/* 将每个标签链接变成一个卡片 */
+			.tag-badge {
+				display: flex;
+				align-items: baseline;
+				padding: 0.6rem 1.1rem; /* 使用和标签云页面一致的内边距 */
+				border: 1px solid var(--border-color); /* 添加边框 */
+				border-radius: 8px; /* 添加圆角 */
+				background-color: transparent; /* 默认背景透明 */
+				text-decoration: none;
+				transition: background-color 0.2s ease, border-color 0.2s ease;
+			}
+
+			/* 添加与标签云页面一致的悬浮特效 */
+			.tag-badge:hover {
+				background-color: var(--code-bg-color);
+				border-color: var(--link-color);
+			}
+
+			.tag-badge:hover .tag-name-wrapper {
+				color: var(--link-color);
+			}
+
+			/* 为了能同时给 # 和文字应用 hover 效果，我们用一个 span 包裹它们 */
+			.tag-name-wrapper {
+				color: var(--heading-color);
+				font-size: 1.05em;
+				font-weight: 600;
+				transition: color 0.2s ease;
+			}
+
+			.tag-name-wrapper::before {
+				content: '#';
+				color: var(--link-color);
+				font-weight: 700;
+				margin-right: 4px;
+				opacity: 0.6;
+			}
 		</style>
 	</head>
 
@@ -102,8 +148,18 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							}
 						</div>
 						<h1>{title}</h1>
+						{tags && tags.length > 0 && (
+							<div class="tags-container">
+								{tags.map((tag) => (
+									<a href={`/tags/${tag}`} class="tag-badge">
+										<span class="tag-name-wrapper">{tag}</span>
+									</a>
+								))}
+							</div>
+						)}
 						<hr />
 					</div>
+
 					<slot />
 				</div>
 			</article>

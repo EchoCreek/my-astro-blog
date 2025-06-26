@@ -50,22 +50,28 @@ const posts = (await getCollection('blog')).sort(
 			}
 			ul li a {
 				display: block;
+				padding: 1.5rem; /* 为卡片添加内边距 */
+				border: 1px solid var(--border-color); /* 添加边框 */
+				border-radius: 12px; /* 添加圆角 */
+				transition: background-color 0.2s ease, border-color 0.2s ease;
 			}
 			.title {
 				margin: 0;
 				color: var(--heading-color);
 				line-height: 1;
 			}
-			.date {
+			/* .date {
 				margin: 0;
 				color: var(--font-color);
 				opacity: 0.7;
+			} */
+			ul li a:hover {
+				background-color: var(--code-bg-color); /* 悬浮时改变背景色 */
+				border-color: var(--link-color); /* 悬浮时改变边框颜色 */
 			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: var(--link-color);
-			}
-			ul a:hover img {
+
+			/* 当整个卡片都有特效后，单独的图片阴影效果可以保留，也可以移除，看你个人喜好 */
+			ul li a:hover img {
 				box-shadow: var(--box-shadow);
 			}
 			@media (max-width: 720px) {
@@ -83,12 +89,55 @@ const posts = (await getCollection('blog')).sort(
 					font-size: 1.563em;
 				}
 			}
+			.meta-line {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 1rem; /* 稍微增大日期和标签整体之间的间距 */
+				font-size: 0.9em;
+				margin-top: 0.5rem;
+				/* 移除了全局的 opacity */
+			}
+
+			/* 为 time 元素（日期）单独设置样式 */
+			.meta-line time {
+				color: var(--font-color);
+				opacity: 0.7; /* 让日期保持原来的灰色效果 */
+			}
+
+			.tags-list {
+				display: flex;
+				gap: 0.5rem;
+			}
+				
+			.tag-item {
+				color: var(--font-color); /* 让标签文字使用默认字体颜色 */
+				opacity: 1; /* 确保标签文字不透明 */
+			}
+
+			/* 使用 ::before 伪元素来添加 # 号，并给它设置柔和的颜色 */
+			.tag-item::before {
+				content: '#';
+				margin-right: 3px;
+				color: var(--link-color); /* 让 # 号使用链接颜色，更醒目 */
+				opacity: 0.6;
+			}
+			.description {
+				margin: 0.5rem 0; /* 控制与上方标题和下方日期的间距 */
+				font-size: 0.95em; /* 字号比正文稍小 */
+				color: var(--font-color);
+				opacity: 0.8; /* 颜色比标题和日期稍浅，作为次要信息 */
+				line-height: 1.6; /* 确保行高舒适 */
+			}
+
+			
 		</style>
 	</head>
 	<body>
 		<div class="page-wrapper">
 		<Header />
 		<main>
+			<p></p>
 			<section>
 				<ul>
 					{
@@ -99,9 +148,19 @@ const posts = (await getCollection('blog')).sort(
 										<Image width={720} height={360} src={post.data.heroImage} alt="" />
 									)}
 									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
+									
+									<div class="meta-line">
+										<time datetime={post.data.pubDate.toISOString()}>
+											{new Date(post.data.pubDate).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+										</time>
+										<div class="tags-list">
+											{post.data.tags.map((tag) => (
+												<span class="tag-item">{tag}</span>
+											))}
+										</div>
+									</div>
+
+									<p class="description">{post.data.description}</p>
 								</a>
 							</li>
 						))
