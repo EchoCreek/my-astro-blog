@@ -1,0 +1,38 @@
+---
+// src/layouts/PageLayout.astro
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// 这个布局只要求最基本的属性
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+	<BaseHead title={title} description={description} />
+</head>
+<body>
+	<div class="page-wrapper">
+		<Header />
+		<main>
+			{/* 这里直接渲染页面内容 */}
+			<slot />
+		</main>
+		<Footer />
+	</div>
+</body>
+</html>
+
+<style>
+    main h1 {
+        /* 只对 main 区域内的 h1 标题应用居中对齐 */
+        text-align: center;
+    }
+</style>

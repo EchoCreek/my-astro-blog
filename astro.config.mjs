@@ -7,7 +7,7 @@ import expressiveCode from 'astro-expressive-code';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
+	site: 'https://blog.dreamtea.top',
 	integrations: [ 
 		expressiveCode({
       // 在这里可以添加您的自定义配置，我们先用一个基础的

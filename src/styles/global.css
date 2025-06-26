@@ -42,7 +42,7 @@ html.dark {
 	--heading-color: #ffffff;
 	--link-color: #64b5f6;
 	--code-bg-color: rgba(var(--black), 50%);
-	--border-color: rgb(var(--gray-dark));
+	--border-color: rgba(var(--gray-light), 0.4);
 	--blockquote-border: #64b5f6;
 	--box-shadow:
 		0 4px 8px rgba(var(--black), 25%), 0 8px 16px rgba(var(--black), 25%);

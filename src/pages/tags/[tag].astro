@@ -1,0 +1,123 @@
+---
+import Layout from '../../layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets'; // 导入 Image 组件
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection('blog');
+	const allTags = allPosts.flatMap((post) => post.data.tags);
+	const uniqueTags = [...new Set(allTags)];
+
+	return uniqueTags.map((tag) => {
+		return {
+			params: { tag: tag },
+			props: { tag: tag },
+		};
+	});
+}
+
+const { tag } = Astro.props;
+const allPosts = await getCollection('blog');
+
+const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
+---
+<Layout title={`标签: ${tag}`} description={`所有被标记为 "${tag}" 的文章`}>
+    <div class="header">
+        <h1>标签: <span class="tag-name">{tag}</span></h1>
+        <p>共找到 {filteredPosts.length} 篇文章</p>
+    </div>
+
+    {/* 使用和主博客页完全一样的 ul > li > a 结构 */}
+    <ul>
+        {filteredPosts.map((post) => (
+            <li>
+                <a href={`/blog/${post.id}/`}>
+                    {post.data.heroImage && (
+                        <Image width={720} height={360} src={post.data.heroImage} alt="" />
+                    )}
+                    <h4 class="title">{post.data.title}</h4>
+                    <p class="description">{post.data.description}</p>
+                    <div class="meta-line">
+                        <time datetime={post.data.pubDate.toISOString()}>
+                            {new Date(post.data.pubDate).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </time>
+                        {/* 在标签详情页的文章列表里，可以不显示标签，因为它们都属于同一个标签 */}
+                    </div>
+                </a>
+            </li>
+        ))}
+    </ul>
+</Layout>
+
+<style>
+    /* --- 使用和主博客页完全一样的 CSS 样式 --- */
+    .header {
+		margin-bottom: 2rem;
+	}
+    .tag-name {
+        color: var(--link-color);
+    }
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+    ul li {
+        width: 100%; /* 在标签详情页，让每篇文章都占满一行，更清晰 */
+    }
+    ul li * {
+        text-decoration: none;
+        transition: 0.2s ease;
+    }
+    ul li img {
+        margin-bottom: 0.5rem;
+        border-radius: 12px;
+        width: 100%;
+    }
+    /* 卡片样式 */
+    ul li a {
+        display: block;
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        height: 100%; /* 确保卡片等高 */
+        box-sizing: border-box;
+    }
+    /* 卡片悬浮特效 */
+    ul li a:hover {
+        background-color: var(--code-bg-color);
+        border-color: var(--link-color);
+    }
+    ul li a:hover img {
+        box-shadow: var(--box-shadow);
+    }
+    .title {
+        margin: 0 0 0.5rem;
+        color: var(--heading-color);
+        font-size: 1.5em;
+        line-height: 1.2;
+    }
+    .description {
+        margin: 0.5rem 0;
+        font-size: 0.95em;
+        color: var(--font-color);
+        opacity: 0.8;
+        line-height: 1.6;
+    }
+    .meta-line {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.9em;
+        margin-top: 1rem; /* 增大了与描述的间距 */
+    }
+    .meta-line time {
+        color: var(--font-color);
+        opacity: 0.7;
+    }
+</style>

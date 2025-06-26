@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const allTags = posts.flatMap(post => post.data.tags);
+const tagCounts = allTags.reduce((acc, tag) => {
+  acc[tag] = (acc[tag] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>);
+const uniqueTags = Object.keys(tagCounts);
+---
+<Layout title="所有标签" description="网站中使用的所有文章标签">
+    <p></p>
+    <h1>所有标签</h1>
+    <div class="tag-cloud">
+        {uniqueTags.map(tag => (
+            <a href={`/tags/${tag}`} class="tag-link">
+                <span class="tag-name">{tag}</span>
+                <span class="tag-count">{tagCounts[tag]}</span>
+            </a>
+        ))}
+    </div>
+</Layout>
+
+<style>
+    /* --- 核心修改：应用与主博客页一致的卡片化样式 --- */
+    .tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    /* 将每个标签链接变成一个卡片 */
+    .tag-link {
+        display: flex;
+        align-items: baseline;
+        padding: 0.75rem 1.25rem;
+        border: 1px solid var(--border-color); /* 添加边框 */
+        border-radius: 12px; /* 添加圆角 */
+        background-color: transparent; /* 默认背景透明 */
+        text-decoration: none;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* 添加与主博客页一致的悬浮特效 */
+    .tag-link:hover {
+        background-color: var(--code-bg-color);
+        border-color: var(--link-color);
+    }
+
+    /* 悬浮时，#号和标签名都变为链接色，反馈更清晰 */
+    .tag-link:hover .tag-name,
+    .tag-link:hover .tag-name::before {
+        color: var(--link-color);
+        opacity: 1; /* 确保悬浮时 # 号不透明 */
+    }
+
+    .tag-name {
+        color: var(--heading-color);
+        font-size: 1.05em;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .tag-name::before {
+        content: '#';
+        color: var(--link-color);
+        font-weight: 700;
+        margin-right: 4px;
+        opacity: 0.6;
+        transition: color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .tag-count {
+        margin-left: 0.5rem;
+        font-size: 0.9em;
+        font-weight: 400;
+        color: var(--font-color);
+        opacity: 0.7;
+    }
+</style>
